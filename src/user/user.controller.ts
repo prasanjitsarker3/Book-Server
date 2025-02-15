@@ -21,6 +21,7 @@ import { Response, Request } from 'express';
 import { LoginUserDto } from './dto/login-user.dtio';
 import { AuthGuard } from 'src/Authentication/AuthGuard';
 import { JwtUser } from 'src/Authentication/JwtUser';
+import { Public } from 'src/Authentication/decorator';
 
 @Controller('user')
 @UseFilters(HttpExceptionFilter)
@@ -30,9 +31,8 @@ export class UserController {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-
+  @Public()
   @Post()
-  @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<ApiResponse<any>> {
@@ -43,9 +43,8 @@ export class UserController {
       user,
     );
   }
-
+  @Public()
   @Post('login')
-  @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Res({ passthrough: true }) res: Response,
@@ -74,8 +73,8 @@ export class UserController {
     );
   }
 
+  @Public()
   @Post('refresh')
-  @HttpCode(HttpStatus.OK)
   async refreshToken(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -109,6 +108,7 @@ export class UserController {
     }
   }
 
+  @Public()
   @Get()
   async findAll(): Promise<ApiResponse<any>> {
     const users = await this.userService.findAll();

@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
-    private configService: ConfigService, // Inject ConfigService
+    private configService: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
     ]);
 
     if (isPublic) {
-      return true; // Skip authentication for public routes
+      return true;
     }
 
     const request = context.switchToHttp().getRequest();
@@ -38,7 +38,12 @@ export class AuthGuard implements CanActivate {
         secret: this.configService.get<string>('accessToken'),
       });
       request['user'] = payload;
-    } catch {
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      }
       throw new UnauthorizedException();
     }
     return true;

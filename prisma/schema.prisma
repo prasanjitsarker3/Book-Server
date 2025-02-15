@@ -13,9 +13,52 @@ model User {
   name     String
   email    String  @unique
   password String
+  role        Role        @default(USER) 
+  status      UserStatus  @default(ACTIVE)
+  isDeleted   Boolean     @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  profile     Profile?
+
 
   @@map("users")
 }
 
+model Profile {
+  id       String  @id @default(uuid())
+  name String?
+  lastName  String?
+  bio       String?
+  phoneNumber String?
+  location    String?
+  city        String?
+  totalOrders Int         @default(0)
+  active      Boolean     @default(true)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("profiles")
+}
+
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum MemberType {
+  FREE
+  PREMIUM
+  VIP
+}
